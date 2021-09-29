@@ -8,16 +8,6 @@ import mongoose from "mongoose";
  * @param members:array
  */
 
-export interface IDose {
-  address: string;
-  vaccineType: string;
-  age: string;
-  cost: string;
-  date: string;
-  timeSlot: string;
-  vaccinatedType: string;
-}
-
 export interface IMembers {
   photoId: string,
   photoIdNumber: string
@@ -36,16 +26,6 @@ export interface IUser extends Document {
   password: string;
   members: Array<IMembers>;
 }
-
-const doseSchema = new Schema({
-  address: { type: String },
-  vaccineType: { type: String },
-  age: { type: String },
-  cost: { type: String },
-  date: { type: String },
-  timeSlot: { type: String },
-  vaccinatedType: { type: String }
-}, { _id: false });
 
 const membersSchema = new Schema({
   photoId: { type: String },
