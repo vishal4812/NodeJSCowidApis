@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken"
 import { success, error, dataArray } from "../response_builder/responsefunction";
 import responsecode from "../response_builder/responsecode";
 import moment from "moment";
+import * as cowidService from "../service/cowidService";
 const { Validator } = require('node-input-validator');
 
 const userApiController = {
@@ -185,7 +186,7 @@ const userApiController = {
                                 if (first.vaccinatedType === "success") {
                                     if (second.vaccinatedType === "success") {
                                         let meta: object = { message: "vaccinated successfully", status: "Success" };
-                                        res.status(responsecode.Success).json(success(meta, user));
+                                        res.status(responsecode.Success).json(success(meta, dataArray));
                                     } else {
                                         if (second.vaccinatedType === "scheduled") {
                                             let meta: object = { message: "second dose already scheduled", status: "Success" };
@@ -244,39 +245,7 @@ const userApiController = {
                                         let meta: object = { message: "already vaccinated with first dose", status: "Success" };
                                         res.status(responsecode.Success).json(success(meta, dataArray));
                                     } else {
-                                        user.members[j].vaccinatedType = "Partially vaccinated";
-                                        const doseFields: object = {
-                                            address: first.address,
-                                            vaccineType: first.vaccineType,
-                                            age: first.age,
-                                            cost: first.cost,
-                                            date: first.date,
-                                            timeSlot: first.timeSlot,
-                                            vaccinatedType: "success"
-                                        };
-                                        user.members[j].firstDose = doseFields;
-                                        user.members[j].secondDose = {};
-                                        let second: any = user.members[j].secondDose;
-                                        if (first.vaccineType === "cowaxin") {
-                                            let due = new Date(first.date);
-                                            let dueDate = new Date(due.setMonth(due.getMonth() + 1));
-                                            let dueDateFormat = moment(dueDate).format("D MMMM y");
-                                            let last = new Date(dueDateFormat);
-                                            let lastDate = new Date(last.setMonth(last.getMonth() + 1));
-                                            let lastDateFormat = moment(lastDate).format("D MMMM y");
-                                            second.dueDate = dueDateFormat;
-                                            second.lastDate = lastDateFormat;
-                                        } else if (first.vaccineType === "covishield") {
-                                            let due = new Date(first.date);
-                                            let dueDate = new Date(due.setMonth(due.getMonth() + 3));
-                                            let dueDateFormat = moment(dueDate).format("D MMMM y");
-                                            let last = new Date(dueDateFormat);
-                                            let lastDate = new Date(last.setMonth(last.getMonth() + 1));
-                                            let lastDateFormat = moment(lastDate).format("D MMMM y");
-                                            second.dueDate = dueDateFormat;
-                                            second.lastDate = lastDateFormat;
-                                        }
-                                        await user.save();
+                                        cowidService.calculateFirstDose(user.members[j], user);
                                         let meta: object = { message: "successfully vaccinated with first dose", status: "Success" };
                                         res.status(responsecode.Success).json(success(meta, user));
                                     }
@@ -300,24 +269,16 @@ const userApiController = {
                                                 let meta: object = { message: "already vaccinated with second dose", status: "Success" };
                                                 res.status(responsecode.Success).json(success(meta, dataArray));
                                             } else {
-                                                user.members[j].vaccinatedType = "Successfully Vaccinated"
-                                                const doseFields: object = {
-                                                    address: second.address,
-                                                    vaccineType: second.vaccineType,
-                                                    age: second.age,
-                                                    cost: second.cost,
-                                                    date: second.date,
-                                                    timeSlot: second.timeSlot,
-                                                    vaccinatedType: "success"
-                                                };
-                                                user.members[j].secondDose = doseFields;
-                                                await user.save();
+                                                cowidService.calculateSecondDose(user.members[j], user);
                                                 let meta: object = { message: "successfully vaccinated with second dose", status: "Success" };
                                                 res.status(responsecode.Success).json(success(meta, user));
                                             }
                                         }
                                     }
                                 }
+                            } else {
+                                let meta: object = { message: "dose not available", status: "Failed" };
+                                res.status(responsecode.Internal_Server_Error).json(error(meta, dataArray));
                             }
                         } else {
                             let meta: object = { message: "secretcode is not valid", status: "Failed" };
