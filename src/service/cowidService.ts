@@ -1,9 +1,8 @@
 import moment from "moment";
 
-export async function calculateSecondDose(users: any,user:any) {
+export async function calculateFirstDose(users: any,user:any) {
     users.vaccinatedType = "Partially vaccinated";
-    let first: any = users.firstDose;
-    let second: any = users.secondDose;
+    let first:any = users.firstDose;
     const doseFields: object = {
         address: first.address,
         vaccineType: first.vaccineType,
@@ -13,8 +12,8 @@ export async function calculateSecondDose(users: any,user:any) {
         timeSlot: first.timeSlot,
         vaccinatedType: "success"
     };
-    user.users.firstDose = doseFields;
-    user.users.secondDose = {};
+    users.firstDose = doseFields;
+    users.secondDose = {};
     if (first.vaccineType === "cowaxin") {
         let due = new Date(first.date);
         let dueDate = new Date(due.setMonth(due.getMonth() + 1));
@@ -22,8 +21,11 @@ export async function calculateSecondDose(users: any,user:any) {
         let last = new Date(dueDateFormat);
         let lastDate = new Date(last.setMonth(last.getMonth() + 1));
         let lastDateFormat = moment(lastDate).format("D MMMM y");
-        second.dueDate = dueDateFormat;
-        second.lastDate = lastDateFormat;
+        const doseFields: object = {
+            dueDate: dueDateFormat,
+            lastDate: lastDateFormat
+        };
+        users.secondDose = doseFields;
     } else if (first.vaccineType === "covishield") {
         let due = new Date(first.date);
         let dueDate = new Date(due.setMonth(due.getMonth() + 3));
@@ -31,8 +33,27 @@ export async function calculateSecondDose(users: any,user:any) {
         let last = new Date(dueDateFormat);
         let lastDate = new Date(last.setMonth(last.getMonth() + 1));
         let lastDateFormat = moment(lastDate).format("D MMMM y");
-        second.dueDate = dueDateFormat;
-        second.lastDate = lastDateFormat;
+        const doseFields: object = {
+            dueDate: dueDateFormat,
+            lastDate: lastDateFormat
+        };
+        users.secondDose = doseFields;
     }
     return await user.save();
+}
+
+export async function calculateSecondDose(users: any,user:any) {
+    users.vaccinatedType = "Successfully Vaccinated"
+    let second:any = users.secondDose;
+    const doseFields: object = {
+        address: second.address,
+        vaccineType: second.vaccineType,    
+        age: second.age,
+        cost: second.cost,
+        date: second.date,
+        timeSlot: second.timeSlot,
+        vaccinatedType: "success"
+    };
+    users.secondDose = doseFields;
+    await user.save();
 }
