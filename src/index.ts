@@ -16,7 +16,7 @@ app.get("/", (_req, res) => {
   res.send("API Running");
 });
 
-app.use('/api/user',user);
+app.use('/api/user', user);
 
 const port = app.get("port")
 const server = app.listen(port, () =>
