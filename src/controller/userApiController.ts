@@ -2,7 +2,7 @@ import config from "config";
 import bcrypt from "bcrypt";
 import { Response } from "express";
 import Request from "../types/Request";
-import User, { IMembers, IUser, IDose } from "../model/User";
+import User, { IMembers, IUser } from "../model/User";
 import jwt from "jsonwebtoken"
 import { success, error, dataArray } from "../response_builder/responsefunction";
 import responsecode from "../response_builder/responsecode";
