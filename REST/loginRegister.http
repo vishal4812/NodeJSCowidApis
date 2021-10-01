@@ -1,0 +1,11 @@
+### Login user and get token
+POST  http://localhost:3000/api/user
+@Variables = 
+{ 
+    "mobile": "6353653848",
+    "password": "addweb123" 
+}
+
+### Get authenticated user using the token
+GET  http://localhost:3000/api/user
+x-auth-token: {{token}}

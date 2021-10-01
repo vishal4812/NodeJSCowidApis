@@ -1,0 +1,8 @@
+### Add member api.
+POST  http://127.0.0.1:3000/api/user/vaccinated
+x-auth-token: {{token}}
+@Variables = 
+{
+    "secretCode":1291,
+    "dose": "second"
+}
